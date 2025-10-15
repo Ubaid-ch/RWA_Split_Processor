@@ -1,66 +1,59 @@
-## Foundry
+# MinimalSplitProcessor
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A smart contract for handling service payments with dynamic fee splitting between sellers and the company.
 
-Foundry consists of:
+## Features
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **Fee Splitting**: Automatically splits payments between seller (95%) and company (5%) by default
+- **ERC20 Support**: Works with any ERC20 token
+- **Gasless Approvals**: Optional ERC20 permit() support for meta-transactions
+- **Secure Claims**: Sellers can securely claim their accumulated balances
+- **Configurable**: Owner can adjust fee rates and company wallet
 
-## Documentation
+## Key Functions
 
-https://book.getfoundry.sh/
+### `pay()`
+Make a payment for a service:
+- Specify seller, token, amount
+- Include service and invoice IDs for tracking
+- Optional permit data for gasless approvals
 
-## Usage
+### `claim()`
+Sellers can withdraw their accumulated balances for any token.
 
-### Build
+### `getSellerInfo()`
+View a seller's claimable balance for a specific token.
 
-```shell
-$ forge build
-```
+## Fee Structure
+- Default: 95% to seller, 5% to company
+- Configurable by owner (up to 10% max company fee)
+- Fees calculated in basis points (500 = 5%)
 
-### Test
+## Events
+- `Paid`: Emitted when a payment is processed
+- `Claimed`: Emitted when a seller claims funds
+- `CommissionUpdated`: Emitted when fee rate changes
+- `CompanyWalletUpdated`: Emitted when company wallet changes
 
-```shell
-$ forge test
-```
+## Security
+- Ownable contract with restricted admin functions
+- Input validation and safe ERC20 transfers
+- Maximum fee limit to protect sellers
 
-### Format
+## Development
 
-```shell
-$ forge fmt
-```
+### Foundry Commands
 
-### Gas Snapshots
+```bash
+# Initialize new project
+forge init
 
-```shell
-$ forge snapshot
-```
+# Install dependencies
+forge install openzeppelin/openzeppelin-contracts
 
-### Anvil
+# Build contract
+forge build
 
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+# Run tests
+forge test
 ```
