@@ -9,7 +9,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title PaymentProcessor
  * @notice Handles service payments with a dynamic fee split between seller and company.
- *         Default: 95% seller / 5% company (configurable by owner).
+ *         Default: 70% seller / 30% company (configurable by owner).
  *         Supports ERC20 tokens and optional permit() approvals.
  *         Each payment can be tracked by serviceId and invoiceId.
  */
@@ -19,8 +19,8 @@ contract MinimalSplitProcessor is Ownable {
     /// @notice Address receiving the company commission
     address public companyWallet;
 
-    /// @notice Company commission rate in basis points (e.g., 500 = 5%)
-    uint256 public companyFeeBps = 500; // default 5%
+    /// @notice Company commission rate in basis points (e.g., 3000 = 30%)
+    uint256 public companyFeeBps = 3000; // default 30%
     uint256 public constant BPS = 10000;
 
     /// @notice Seller token balances for later withdrawal
@@ -149,7 +149,7 @@ contract MinimalSplitProcessor is Ownable {
      * @param newFeeBps New company fee rate (e.g., 500 = 5%).
      */
     function setCompanyFee(uint256 newFeeBps) external onlyOwner {
-        require(newFeeBps <= 1000, "Fee too high (max 10%)"); // safety limit
+       // require(newFeeBps <= 1000, "Fee too high (max 10%)"); // safety limit
         emit CommissionUpdated(companyFeeBps, newFeeBps);
         companyFeeBps = newFeeBps;
     }

@@ -4,7 +4,7 @@ A smart contract for handling service payments with dynamic fee splitting betwee
 
 ## Features
 
-- **Fee Splitting**: Automatically splits payments between seller (95%) and company (5%) by default
+- **Fee Splitting**: Automatically splits payments between seller (70%) and company (30%) by default
 - **ERC20 Support**: Works with any ERC20 token
 - **Gasless Approvals**: Optional ERC20 permit() support for meta-transactions
 - **Secure Claims**: Sellers can securely claim their accumulated balances
@@ -25,9 +25,9 @@ Sellers can withdraw their accumulated balances for any token.
 View a seller's claimable balance for a specific token.
 
 ## Fee Structure
-- Default: 95% to seller, 5% to company
-- Configurable by owner (up to 10% max company fee)
-- Fees calculated in basis points (500 = 5%)
+- Default: 70% to seller, 30% to company
+- Configurable by owner 
+- Fees calculated in basis points (3000 = 30%)
 
 ## Events
 - `Paid`: Emitted when a payment is processed

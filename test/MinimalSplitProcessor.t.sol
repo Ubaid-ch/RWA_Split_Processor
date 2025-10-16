@@ -29,7 +29,7 @@ contract MinimalSplitProcessorTest is Test {
     address public buyer;
     address public seller;
 
-    uint256 public constant COMPANY_FEE_BPS = 500; // 5%
+    uint256 public constant COMPANY_FEE_BPS = 3000; // 5%
     uint256 public constant BPS = 10000;
 
     // Private keys for permit signing

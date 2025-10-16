@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Processor Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f8fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    h2 { color: #333; }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 400px;
+      margin-top: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background-color: #4f46e5;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background-color: #4338ca; }
+    #output {
+      background: #eef2ff;
+      color: #111;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Payment Processor Test</h2>
+  <div class="card">
+    <button id="connectBtn">Connect Wallet</button>
+
+    <h3>Pay with Permit</h3>
+    <input type="text" id="seller" placeholder="Seller address (0x...)" />
+    <input type="text" id="amount" placeholder="Amount in USDC (e.g. 1.5)" />
+    <input type="text" id="serviceId" placeholder="Service ID (number)" />
+    <input type="text" id="invoiceId" placeholder="Invoice ID (number)" />
+    <button id="payBtn">Pay</button>
+
+    <h3>Check Seller Balance</h3>
+    <input type="text" id="sellerCheck" placeholder="Seller address (0x...)" />
+    <button id="checkBtn">Get Balance</button>
+
+    <h3>Claim Balance</h3>
+    <button id="claimBtn">Claim</button>
+
+    <div id="output">Status messages will appear here...</div>
+  </div>
+
+  <!-- Import your JS module -->
+  <script type="module">
+    import { PaymentProcessor } from './MinimalSplitProcessor.js';
+    //import { ethers } from 'ethers'; // this will use local ethers installed in node_modules
+
+    const processor = new PaymentProcessor();
+    const connectBtn = document.getElementById('connectBtn');
+    const payBtn = document.getElementById('payBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const claimBtn = document.getElementById('claimBtn');
+    const output = document.getElementById('output');
+
+    const log = (msg) => { output.textContent = msg; console.log(msg); };
+
+    let signer;
+
+    connectBtn.onclick = async () => {
+      try {
+        signer = await processor.connectWallet();
+        log("Connected: " + await signer.getAddress());
+      } catch (err) {
+        log("  " + err.message);
+      }
+    };
+
+    payBtn.onclick = async () => {
+      const seller = document.getElementById('seller').value.trim();
+      const amount = document.getElementById('amount').value.trim();
+      const serviceId = document.getElementById('serviceId').value.trim();
+      const invoiceId = document.getElementById('invoiceId').value.trim();
+
+      if (!seller || !amount || !serviceId || !invoiceId) {
+        log("Please fill all payment fields.");
+        return;
+      }
+
+      try {
+        log("Sending payment...");
+        const tx = await processor.payWithPermit(seller, amount, serviceId, invoiceId);
+        log(`Transaction sent! Hash: ${tx.hash}`);
+        await tx.wait();
+        log(`Payment confirmed!`);
+      } catch (err) {
+        log("Payment failed: " + err.message);
+      }
+    };
+
+    checkBtn.onclick = async () => {
+      const seller = document.getElementById('sellerCheck').value.trim();
+      if (!seller) { log("Enter seller address."); return; }
+      try {
+        const info = await processor.getSellerBalance(seller);
+        const balance = ethers.formatUnits(info.balance, 6);
+        log(`Seller balance: ${balance} USDC`);
+      } catch (err) {
+        log("  Failed to fetch balance: " + err.message);
+      }
+    };
+
+    claimBtn.onclick = async () => {
+      try {
+        log("Claiming balance...");
+        const tx = await processor.claim();
+        log(`Claim transaction sent: ${tx.hash}`);
+        await tx.wait();
+        log(`Claim confirmed!`);
+      } catch (err) {
+        log("Claim failed: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>

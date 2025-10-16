@@ -2,5 +2,9 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+chain_id = 84532
+
+[rpc_endpoints]
+base_sepolia = "${ALCHEMY_BASE_SEPOLIA_URL}"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
